@@ -8,10 +8,11 @@ Created on 28/10/2019
 from graphics import *
 from tkinter.constants import CENTER
 
+
 class BatalhaNavalWindow:
     
     '''
-    Classe que cria uma janela para vizualização grafica do estado da BatalhaNaval
+    Classe que cria uma janela para visualização gráfica do estado da Batalha Naval
     '''
 
     def __init__(self, cell_size, linhas=10, colunas=10):
@@ -26,11 +27,9 @@ class BatalhaNavalWindow:
         self.puzzle = GraphWin("BatalhaNaval", self.nlinhas * self.cell_size + self.cell_size, self.ncolunas * self.cell_size + self.cell_size)
         pass   
     
-    
     def __del__(self):
         self.puzzle.close()  # fechar a janela
         
-    
     def desenhaCasa(self, coluna, linha):
         '''
         Desenha uma casa vazia 
@@ -137,7 +136,6 @@ class BatalhaNavalWindow:
         c.setFill("black")
         c.draw(self.puzzle)
 
-        
     def desenhaLinha(self, x1, y1, x2, y2, espessura, cor):
         '''
         Desenha uma linha
@@ -153,8 +151,6 @@ class BatalhaNavalWindow:
         l.setWidth(espessura)
         l.draw(self.janela)
      
-
-    
     def desenhaNumLinha(self, linha):
         '''
         Desenha os numeros das linhas e as linhas horizontais da grelha
@@ -167,7 +163,7 @@ class BatalhaNavalWindow:
         '''
         Desenha a letra das linhas e as linhas horizontais da grelha
         ''' 
-        letras=['A','B','C','D','E','F','G','H','I','J']
+        letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         label = Text(Point(0 + self.cell_size / 2, linha * self.cell_size + self.cell_size / 2), letras[linha-1])
         label.setTextColor("black")
         label.draw(self.puzzle)
@@ -177,7 +173,7 @@ class BatalhaNavalWindow:
         Desenha os numeros das colunas e as linhas verticais da grelha
         ''' 
         for i in range(1, colunas + 1):
-            label = Text(Point(i * self.cell_size + self.cell_size / 2 , self.cell_size / 2), str(i))
+            label = Text(Point(i * self.cell_size + self.cell_size / 2, self.cell_size / 2), str(i))
             label.setTextColor("black")
             label.draw(self.puzzle)
     
@@ -201,8 +197,8 @@ class BatalhaNavalWindow:
                     elif simbolo == 'X':
                         self.desenhaCasaBloqueadaNum(coluna + 1, linha + 1, simbolo)
                     elif simbolo == 'O':
-                        #self.desenhaCasaBloqueadaNum(coluna + 1, linha + 1, simbolo)
-                        self.desenhaCasaAgua(coluna+1,linha+1)
+                        # self.desenhaCasaBloqueadaNum(coluna + 1, linha + 1, simbolo)
+                        self.desenhaCasaAgua(coluna+1, linha+1)
                     elif simbolo == '*':
                         self.desenhaCasaBloqueadaNum_iluminada(coluna + 1, linha + 1, simbolo)
                     else:

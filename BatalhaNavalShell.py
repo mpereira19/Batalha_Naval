@@ -21,47 +21,75 @@ class BatalhaNavalShell(Cmd):
             if num_args == 2:
                 eng.ler_tabuleiro_ficheiro(lista_arg[0])
                 eng.setjogador(lista_arg[1])
-                #eng.print_tab_jogo()
+                # eng.print_tab_jogo()
                 eng.print_tab_estado()
             else:
                 print("Número de argumentos inválido!")
         except:
             print("Erro: ao mostrar o puzzle")
+
     def do_gravar(self, arg):
         " - comando gravar que leva como parâmetro o nome de um ficheiro e permite gravar o estado do jogo atual..: gravar <nome_ficheiro>  \n"
         pass
     
-    def do_tiro(self, arg):    
+    def do_tiro(self, arg):
         " - comando tiro que leva como parâmetros a linha e a coluna de uma casa onde se pretende jogar..: tiro <l> <c>\n"
-        pass      
-    def do_agua(self, arg):    
+        loc = arg.split()
+        letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        if eng.tab_jogo[letras.index(loc[0])][int(loc[1]-1)] == '.':
+            eng.tab_estado[letras.index(loc[0])][int(loc[1] - 1)] == 'O'
+
+        pass
+
+    def do_agua(self, arg):
         " - comando que leva como parâmetros a linha e a coluna de uma casa, pertencente a uma embarcação já afundada (totalmente descoberta) que se pretende rodear de “água”..: agua <l> <c> \n"
         pass
-    def do_linha(self, arg):    
+
+    def do_linha(self, arg):
         " - comando linha que permite colocar o estado de todas as casas da linha l que ainda não estão determinadas como sendo “água”...: linha <l> \n"
-        pass    
-    def do_coluna(self, arg):    
+        letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        if arg in letras:
+            for a in range(len(eng.tab_estado[letras.index(arg)])):
+                if eng.tab_estado[letras.index(arg)][a] == 'X' or eng.tab_estado[letras.index(arg)][a] == '*' or eng.tab_estado[letras.index(arg)][a] == 'O': pass
+                elif eng.tab_jogo[letras.index(arg)][a] == '.':
+                    eng.tab_estado[letras.index(arg)][a] == 'O'
+                else:
+                    print('Perdeu!!! Fim do jogo!')
+                    return True
+        else:
+            print('Jogada inválida!')
+
+    def do_coluna(self, arg):
         " - comando coluna que permite colocar o estado de todas as casas da coluna c que ainda não estão determinadas como sendo “água”...: coluna <c> \n"
-        pass        
-    def do_ajuda(self, arg):    
+        for a in range(len(eng.tab_estado)):
+            if eng.tab_estado[a][int(arg)-1] == 'X' or eng.tab_estado[a][int(arg)-1] == '*' or eng.tab_estado[a][int(arg)-1] == 'O': pass
+            elif eng.tab_jogo[a][int(arg)-1] == '.':
+                eng.tab_estado[a][int(arg)-1] == 'O'
+            else:
+                print('Perdeu!!! Fim do jogo!')
+                return True
+        else:
+            print('Jogada inválida!')
+
+    def do_ajuda(self, arg):
         " - comando ajuda que indica por linha e por coluna a quantidade de segmentos de barco existentes nessa linha/coluna..: ajuda  \n"
         pass
     
-    def do_undo(self, arg):    
+    def do_undo(self, arg):
         " - comando para anular movimentos (retroceder no jogo): undo \n"
         pass
     
-    def do_bot(self, arg):    
+    def do_bot(self, arg):
         " - comando bot para apresentar a sequência de jogadas ótimas para terminar o jogo: bot \n"
         pass
 
-    def do_gerar(self, arg):    
+    def do_gerar(self, arg):
         " - comando gerar que gera tabuleiros validos..: gerar \n"
         pass
-    def do_score(self, arg):    
+    def do_score(self, arg):
         " - comando score que permite ver o registo ordenado dos scores dos jogadores..: \n"
         pass
-    def do_ver(self, arg):    
+    def do_ver(self, arg):
         " - Comando para visualizar o estado atual do tabuleiro em ambiente grafico caso seja válido: VER  \n"
         global janela  # pois pretendo atribuir um valor a um identificador global
         if janela is not None:
