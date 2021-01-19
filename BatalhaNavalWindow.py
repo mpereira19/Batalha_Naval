@@ -197,7 +197,7 @@ class BatalhaNavalWindow:
                     elif simbolo == 'X':
                         self.desenhaCasaBloqueadaNum(coluna + 1, linha + 1, simbolo)
                     elif simbolo == 'O':
-                        # self.desenhaCasaBloqueadaNum(coluna + 1, linha + 1, simbolo)
+                        self.desenhaCasaBloqueadaNum(coluna + 1, linha + 1, simbolo)
                         self.desenhaCasaAgua(coluna+1, linha+1)
                     elif simbolo == '*':
                         self.desenhaCasaBloqueadaNum_iluminada(coluna + 1, linha + 1, simbolo)

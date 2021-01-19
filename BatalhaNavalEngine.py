@@ -13,6 +13,7 @@ class BatalhaNavalEngine:
         self.tab_estado = []  # matriz que representa o tabuleiro com o estado do jogo
         self.jogador = "top_gun"
         self.score = 0
+        self.jogadas = dict()
     
     def ler_tabuleiro_ficheiro(self, filename):
         '''
@@ -31,6 +32,7 @@ class BatalhaNavalEngine:
                 self.tab_estado.append(lines[i].split())
             estado = True
             self.score = int(lines[23])
+            self.jogadas[self.score] = self.tab_estado
         except:
             print("Erro: na leitura do tabuleiro")
             estado = False
@@ -40,7 +42,7 @@ class BatalhaNavalEngine:
     
     def print_tab_jogo(self):
         print("  1 2 3 4 5 6 7 8 9 10")
-        letras = ['A','B','C','D','E','F','G','H','I','J']
+        letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         i = 0
         for linha in self.tab_jogo:
             print(letras[i], end=" ")
@@ -48,11 +50,11 @@ class BatalhaNavalEngine:
             for simbolo in linha:
                 print(simbolo, end=" ")
             print()
-        print("[%s] Jogadas efetuadas:%d"%(self.jogador, self.score))
+        print("[%s] Jogadas efetuadas:%d" % (self.jogador, self.score))
         
     def print_tab_estado(self):
         print("\n  1 2 3 4 5 6 7 8 9 10")
-        letras=['A','B','C','D','E','F','G','H','I','J']
+        letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         i = 0
         for linha in self.tab_estado:
             print(letras[i], end=" ")
@@ -62,7 +64,7 @@ class BatalhaNavalEngine:
             print()
         print("[%s] Jogadas efetuadas:%d" % (self.jogador, self.score))
 
-    def setjogador(self,jog):
+    def setjogador(self, jog):
         self.jogador = jog
     
     def getjogador(self):
@@ -73,3 +75,9 @@ class BatalhaNavalEngine:
 
     def settab_estado(self, t):
         self.tab_estado = t
+
+    def add_jogadas(self, score, estado):
+        self.jogadas[score] = estado
+
+    def del_jogada(self, score):
+        del self.jogadas[score]
