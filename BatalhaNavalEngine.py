@@ -7,7 +7,7 @@ Created on 28/10/2019
 
 
 class BatalhaNavalEngine:
-    
+
     def __init__(self):
         self.tab_jogo = []  # matriz que representa o tabuleiro de jogo original
         self.tab_estado = []  # matriz que representa o tabuleiro com o estado do jogo
