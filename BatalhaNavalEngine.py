@@ -13,7 +13,6 @@ class BatalhaNavalEngine:
         self.tab_estado = []  # matriz que representa o tabuleiro com o estado do jogo
         self.jogador = "top_gun"
         self.score = 0
-        self.jogadas = dict()
     
     def ler_tabuleiro_ficheiro(self, filename):
         '''
@@ -32,7 +31,6 @@ class BatalhaNavalEngine:
                 self.tab_estado.append(lines[i].split())
             estado = True
             self.score = int(lines[23])
-            self.jogadas[self.score] = self.tab_estado
         except:
             print("Erro: na leitura do tabuleiro")
             estado = False
@@ -75,9 +73,3 @@ class BatalhaNavalEngine:
 
     def settab_estado(self, t):
         self.tab_estado = t
-
-    def add_jogadas(self, score, estado):
-        self.jogadas[score] = estado
-
-    def del_jogada(self, score):
-        del self.jogadas[score]

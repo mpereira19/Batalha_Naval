@@ -66,6 +66,7 @@ class BatalhaNavalShell(Cmd):
     def do_linha(self, arg):
         " - comando linha que permite colocar o estado de todas as casas da linha l que ainda não estão determinadas como sendo “água”...: linha <l> \n"
         letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        import time
         if arg in letras:
             eng.score += 1
             matrix = eng.tab_estado
@@ -76,16 +77,17 @@ class BatalhaNavalShell(Cmd):
                     matrix[letras.index(arg)][a] = 'O'
                 else:
                     print('Perdeu!!! Fim do jogo!')
+                    time.sleep(5)
                     return True
             eng.settab_estado(matrix)
             eng.print_tab_estado()
-            eng.add_jogadas(eng.score, eng.tab_estado)
         else:
             print('Jogada inválida!')
 
     def do_coluna(self, arg):
-        " - comando coluna que permite colocar o estado de todas as casas da coluna c que ainda não estão determinadas como sendo “água”...: coluna <c> \n"
+        " - comando coluna que permite colocar o estado de tsheodas as casas da coluna c que ainda não estão determinadas como sendo “água”...: coluna <c> \n"
         numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+        import time
         if arg in numbers:
             eng.score += 1
             for a in range(len(eng.tab_estado)):
@@ -96,10 +98,9 @@ class BatalhaNavalShell(Cmd):
                     matrix[a][int(arg)-1] = 'O'
                 else:
                     print('Perdeu!!! Fim do jogo!')
+                    time.sleep(5)
                     return True
             eng.settab_estado(matrix)
-            eng.print_tab_estado()
-            eng.add_jogadas(eng.score, eng.tab_estado)
         else:
             print('Jogada inválida!')
 
@@ -126,14 +127,8 @@ class BatalhaNavalShell(Cmd):
     
     def do_undo(self, arg):
         " - comando para anular movimentos (retroceder no jogo): undo \n"
-        last_move = max(list(eng.jogadas))
-        print(eng.jogadas)
-        eng.del_jogada(last_move)
-        print(eng.jogadas)
-        new_last_move = max(list(eng.jogadas))
         eng.score += 1
-        eng.settab_estado(eng.jogadas[new_last_move])
-        eng.print_tab_estado()
+        pass
     
     def do_bot(self, arg):
         " - comando bot para apresentar a sequência de jogadas ótimas para terminar o jogo: bot \n"
@@ -143,15 +138,8 @@ class BatalhaNavalShell(Cmd):
         " - comando gerar que gera tabuleiros validos..: gerar \n"
         import random
 
-        def pos_maker():
-            posl = random.randint(0, 9)
-            posc = random.randint(0, 9)
-            posicao = [posl, posc]
-            return posicao
-
         def pos_checker2(checker, pos):
             if (10 not in pos) and (-1 not in pos):
-                check = True
                 if pos not in checker:
                     check = True
                 else:
@@ -159,6 +147,20 @@ class BatalhaNavalShell(Cmd):
             else:
                 check = False
             return check
+
+        def id_square(pos, checker, mat, pos_checker2):
+            for l in range(len(mat)):
+                for c in range(len(mat[l])):
+                    if [l, c] == [pos[0] - 1, pos[1] - 1] or [l, c] == [pos[0] - 1, pos[1]] or [l, c] == [pos[0] - 1, pos[1] + 1] or [l, c] == [pos[0], pos[1] - 1] or [l, c] == [pos[0], pos[1] + 1] or [l, c] == [pos[0] + 1, pos[1] - 1] or [l, c] == [pos[0] + 1, pos[1]] or [l, c] == [pos[0] + 1, pos[1] + 1]:
+                        if pos_checker2(checker, [l, c]) is True:
+                            checker.append([l, c])
+            return checker
+
+        def pos_maker():
+            posl = random.randint(0, 9)
+            posc = random.randint(0, 9)
+            posicao = [posl, posc]
+            return posicao
 
         def make_turn(turn, pos):
             if turn == 'U':
@@ -178,7 +180,7 @@ class BatalhaNavalShell(Cmd):
                 turn3 = make_turn('L', pos)
                 lst_pos_crz = [turn1, turn2, turn3]
                 for i in lst_pos_crz:
-                    if pos_checker2(checker, i) == False:
+                    if pos_checker2(checker, i) is False:
                         return False
             if turn == 'L':
                 turn1 = make_turn('L', pos)
@@ -186,7 +188,7 @@ class BatalhaNavalShell(Cmd):
                 turn3 = make_turn('R', pos)
                 lst_pos_crz = [turn1, turn2, turn3]
                 for i in lst_pos_crz:
-                    if pos_checker2(checker, i) == False:
+                    if pos_checker2(checker, i) is False:
                         return False
             if turn == 'U':
                 turn1 = make_turn('U', pos)
@@ -194,7 +196,7 @@ class BatalhaNavalShell(Cmd):
                 turn3 = make_turn('D', pos)
                 lst_pos_crz = [turn1, turn2, turn3]
                 for i in lst_pos_crz:
-                    if pos_checker2(checker, i) == False:
+                    if pos_checker2(checker, i) is False:
                         return False
             if turn == 'D':
                 turn1 = make_turn('D', pos)
@@ -202,7 +204,7 @@ class BatalhaNavalShell(Cmd):
                 turn3 = make_turn('U', pos)
                 lst_pos_crz = [turn1, turn2, turn3]
                 for i in lst_pos_crz:
-                    if pos_checker2(checker, i) == False:
+                    if pos_checker2(checker, i) is False:
                         return False
             return lst_pos_crz
 
@@ -214,7 +216,7 @@ class BatalhaNavalShell(Cmd):
                 turn4 = make_turn('R', turn3)
                 lst_pos_av = [turn1, turn2, turn3, turn4]
                 for i in lst_pos_av:
-                    if pos_checker2(checker, i) == False:
+                    if pos_checker2(checker, i) is False:
                         return False
             if turn == 'L':
                 turn1 = make_turn('U', pos)
@@ -223,7 +225,7 @@ class BatalhaNavalShell(Cmd):
                 turn4 = make_turn('L', turn3)
                 lst_pos_av = [turn1, turn2, turn3, turn4]
                 for i in lst_pos_av:
-                    if pos_checker2(checker, i) == False:
+                    if pos_checker2(checker, i) is False:
                         return False
             if turn == 'U':
                 turn1 = make_turn('R', pos)
@@ -232,7 +234,7 @@ class BatalhaNavalShell(Cmd):
                 turn4 = make_turn('U', turn3)
                 lst_pos_av = [turn1, turn2, turn3, turn4]
                 for i in lst_pos_av:
-                    if pos_checker2(checker, i) == False:
+                    if pos_checker2(checker, i) is False:
                         return False
             if turn == 'D':
                 turn1 = make_turn('R', pos)
@@ -241,7 +243,7 @@ class BatalhaNavalShell(Cmd):
                 turn4 = make_turn('D', turn3)
                 lst_pos_av = [turn1, turn2, turn3, turn4]
                 for i in lst_pos_av:
-                    if pos_checker2(checker, i) == False:
+                    if pos_checker2(checker, i) is False:
                         return False
             return lst_pos_av
 
@@ -257,20 +259,23 @@ class BatalhaNavalShell(Cmd):
         n_submarinos = 0
         while n_submarinos < 3:
             pos = pos_maker()
-            if pos_checker2(checker, pos) == True:
+            if pos_checker2(checker, pos) is True:
                 checker.append(pos)
+                checker = id_square(pos, checker, mat_pos, pos_checker2)
                 mat_pos[pos[0]][pos[1]] = 's'
                 n_submarinos += 1
 
         n_rebocadores = 0
         while n_rebocadores < 2:
             pos_barco = pos_maker()
-            if pos_checker2(checker, pos_barco) == True:
+            if pos_checker2(checker, pos_barco) is True:
                 turn = random.choice(['U', 'D', 'L', 'R'])
                 pos_turn = make_turn(turn, pos_barco)
-                if (pos_checker2(checker, pos_turn) == True):
+                if pos_checker2(checker, pos_turn) is True:
                     checker.append(pos_barco)
                     checker.append(pos_turn)
+                    checker = id_square(pos_barco, checker, mat_pos, pos_checker2)
+                    checker = id_square(pos_turn, checker, mat_pos, pos_checker2)
                     mat_pos[pos_barco[0]][pos_barco[1]] = 'r'
                     mat_pos[pos_turn[0]][pos_turn[1]] = 'r'
                     n_rebocadores += 1
@@ -278,15 +283,18 @@ class BatalhaNavalShell(Cmd):
         n_contratorpedeiro = 0
         while n_contratorpedeiro < 1:
             pos_cp = pos_maker()
-            if pos_checker2(checker, pos_cp) == True:
+            if pos_checker2(checker, pos_cp) is True:
                 turn = random.choice(['U', 'R'])
                 if turn == 'R':
                     pos_turn1 = make_turn('R', pos_cp)
                     pos_turn2 = make_turn('L', pos_cp)
-                    if (pos_checker2(checker, pos_turn1) == True) and (pos_checker2(checker, pos_turn2) == True):
+                    if (pos_checker2(checker, pos_turn1) is True) and (pos_checker2(checker, pos_turn2) is True):
                         checker.append(pos_cp)
                         checker.append(pos_turn1)
                         checker.append(pos_turn2)
+                        checker = id_square(pos_cp, checker, mat_pos, pos_checker2)
+                        checker = id_square(pos_turn1, checker, mat_pos, pos_checker2)
+                        checker = id_square(pos_turn2, checker, mat_pos, pos_checker2)
                         mat_pos[pos_cp[0]][pos_cp[1]] = 'c'
                         mat_pos[pos_turn1[0]][pos_turn1[1]] = 'c'
                         mat_pos[pos_turn2[0]][pos_turn2[1]] = 'c'
@@ -294,10 +302,13 @@ class BatalhaNavalShell(Cmd):
                 else:
                     pos_turn1 = make_turn('U', pos_cp)
                     pos_turn2 = make_turn('D', pos_cp)
-                    if (pos_checker2(checker, pos_turn1) == True) and (pos_checker2(checker, pos_turn2) == True):
+                    if (pos_checker2(checker, pos_turn1) is True) and (pos_checker2(checker, pos_turn2) is True):
                         checker.append(pos_cp)
                         checker.append(pos_turn1)
                         checker.append(pos_turn2)
+                        checker = id_square(pos_cp, checker, mat_pos, pos_checker2)
+                        checker = id_square(pos_turn1, checker, mat_pos, pos_checker2)
+                        checker = id_square(pos_turn2, checker, mat_pos, pos_checker2)
                         mat_pos[pos_cp[0]][pos_cp[1]] = 'c'
                         mat_pos[pos_turn1[0]][pos_turn1[1]] = 'c'
                         mat_pos[pos_turn2[0]][pos_turn2[1]] = 'c'
@@ -306,29 +317,33 @@ class BatalhaNavalShell(Cmd):
         n_cruzador = 0
         while n_cruzador < 1:
             pos_crz = pos_maker()
-            if pos_checker2(checker, pos_crz) == True:
+            if pos_checker2(checker, pos_crz) is True:
                 turn = random.choice(['U', 'D', 'L', 'R'])
                 lst_crz = cruzador(turn, pos_crz, checker)
-                if lst_crz != False:
+                if lst_crz is not False:
                     mat_pos[pos_crz[0]][pos_crz[1]] = 'X'
                     checker.append(pos_crz)
                     for pos_resto_crz in lst_crz:
                         mat_pos[pos_resto_crz[0]][pos_resto_crz[1]] = 'X'
                         checker.append(pos_resto_crz)
+                        checker = id_square(pos_crz, checker, mat_pos, pos_checker2)
+                        checker = id_square(pos_resto_crz, checker, mat_pos, pos_checker2)
                         n_cruzador += 1
 
         n_porta_avioes = 0
         while n_porta_avioes < 1:
             pos_pa = pos_maker()
-            if pos_checker2(checker, pos_pa) == True:
+            if pos_checker2(checker, pos_pa) is True:
                 turn = random.choice(['U', 'D', 'L', 'R'])
                 lst_pa = porta_avioes(turn, pos_pa, checker)
-                if lst_pa != False:
+                if lst_pa is not False:
                     mat_pos[pos_pa[0]][pos_pa[1]] = 'A'
                     checker.append(pos_pa)
                     for pos_porta_av in lst_pa:
                         mat_pos[pos_porta_av[0]][pos_porta_av[1]] = 'A'
                         checker.append(pos_porta_av)
+                        checker = id_square(pos_pa, checker, mat_pos, pos_checker2)
+                        checker = id_square(pos_porta_av, checker, mat_pos, pos_checker2)
                         n_porta_avioes += 1
 
         estado = []
@@ -348,7 +363,7 @@ class BatalhaNavalShell(Cmd):
 
             for l in range(len(mat_pos)):
                 for c in range(len(mat_pos[l])):
-                    if c != len(mat_pos[l])-1:
+                    if c != len(mat_pos[l]) - 1:
                         file.write(mat_pos[l][c] + ' ')
                     else:
                         file.write(mat_pos[l][c])
@@ -357,7 +372,7 @@ class BatalhaNavalShell(Cmd):
 
             for l2 in range(len(estado)):
                 for c2 in range(len(estado[l2])):
-                    if c2 != len(estado[l2])-1:
+                    if c2 != len(estado[l2]) - 1:
                         file.write(estado[l2][c2] + ' ')
                     else:
                         file.write(estado[l2][c2])
@@ -394,7 +409,6 @@ if __name__ == '__main__':
     janela = None
     sh = BatalhaNavalShell()
     sh.cmdloop()
-    jogadas = {}
     
 '''
 
