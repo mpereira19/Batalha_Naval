@@ -135,7 +135,6 @@ class BatalhaNavalShell(Cmd):
                             confirmed_hits = [[l, c]]
                             # função que permite saber a posição das restantes posições ocupadas pelo barco
                             lst_conf_hits = ship_wreck_check([l, c], mat_jogador, mat_cheat, confirmed_hits, saver=[])
-                            print(lst_conf_hits)
                             if 'Alive' in lst_conf_hits:  # Se existirem mais posições ainda não descobertas avisa-se que o tiro acertou num barco sem o afundar
                                 eng.print_tab_estado()
                                 print("\nSHIVER ME TIMBERS !!! On the target but it won't go down...\n")
@@ -282,10 +281,7 @@ class BatalhaNavalShell(Cmd):
         time.sleep(1)
         if len(lst_aimbot) != 1:
             self.do_bot('')
-        else:
-            print('\nSHIVER ME TIMBERS !!! Enemy down!! The war is won!!\n')
-            time.sleep(5)
-            return True
+        return True
 
     def do_gerar(self, arg):
         " - comando gerar que gera tabuleiros validos..: gerar \n"
