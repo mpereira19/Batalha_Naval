@@ -13,8 +13,6 @@ class BatalhaNavalShell(Cmd):
     intro = 'Interpretador de comandos para a Batalha Naval adaptada. Escrever help ou ? para listar os comandos disponíveis.\n'
     prompt = 'BatalhaNaval> '
 
-    players_score = {}
-
     def do_jogar(self, arg):
         " -  comando jogar que leva como parâmetro o nome de um ficheiro e a identificação do jogador e carrega o tabuleiro permitindo jogá-lo..: jogar <nome_ficheiro> <jogador> \n"
         try:
@@ -25,6 +23,7 @@ class BatalhaNavalShell(Cmd):
                 eng.setjogador(lista_arg[1])
                 # eng.print_tab_jogo()
                 eng.print_tab_estado()
+                eng.create_jogadas_history()
             else:
                 print("Número de argumentos inválido!")
         except:
@@ -32,56 +31,187 @@ class BatalhaNavalShell(Cmd):
 
     def do_gravar(self, arg):
         " - comando gravar que leva como parâmetro o nome de um ficheiro e permite gravar o estado do jogo atual..: gravar <nome_ficheiro>  \n"
+        import time
         try:
+            matrix = eng.tab_jogo
+            matrix1 = eng.tab_estado
+            score = eng.score
             ficheiro = open(arg+'.txt', 'w')
-            ficheiro.writelines('Tabuleiro:')
-            for lines in range(len(eng.tab_jogo)):
-                ficheiro.write(*eng.tab_jogo[lines])
-            ficheiro.writelines('Estado do Jogo:')
-            for lines in range(len(eng.tab_estado)):
-                ficheiro.write(*eng.tab_estado[lines])
-            ficheiro.writelines('Jogadas efetuadas:')
-            ficheiro.writelines(eng.score)
+            ficheiro.write('Tabuleiro:\n')
+
+            for lines in range(len(matrix)):
+                string = ''
+                for col in range(len(matrix[lines])):
+                    if col != len(matrix[lines])-1:
+                        string += matrix[lines][col] + ' '
+                    else:
+                        string += matrix[lines][col] + '\n'
+                ficheiro.write(string)
+            ficheiro.write('Estado do Jogo:\n')
+
+            for lines in range(len(matrix1)):
+                string = ''
+                for col in range(len(matrix1[lines])):
+                    if col != len(matrix1[lines])-1:
+                        string += matrix1[lines][col] + ' '
+                    else:
+                        string += matrix1[lines][col] + '\n'
+                ficheiro.write(string)
+            ficheiro.write('Jogadas efetuadas:\n')
+            ficheiro.write(str(score))
+            eng.score_files()
             estado = True
         except:
             print('Erro ao guardar o tabuleiro!')
             estado = False
         else:
             ficheiro.close()
+            print('Jogo gravado com sucesso!!!')
+        time.sleep(5)
         return estado
     
     def do_tiro(self, arg):
-        " - comando tiro que leva como parâmetros a linha e a coluna de uma casa onde se pretende jogar..: tiro <l> <c>\n"
-        loc = arg.split()
-        eng.score += 1
-        letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-        if eng.tab_jogo[letras.index(loc[0])][int(loc[1]-1)] == '.':
-            eng.tab_estado[letras.index(loc[0])][int(loc[1] - 1)] == 'O'
-        pass
+        '''
+        - comando tiro que leva como parâmetros a linha e a coluna de uma casa onde se pretende jogar..: tiro <l> <c>.
+
+        Parameters
+        ----------
+        arg : Posição: [l, c]
+
+        Returns
+        -------
+        print do estado de jogo atual com o efeito da função do_tiro
+
+        '''
+
+        import time
+
+        def ship_wreck_check(pos, mat_game, mat_cheat, confirmed_hits, saver):
+            for l in range(len(mat_cheat)):
+                for c in range(len(mat_cheat[l])):
+                    if [l, c] == [pos[0] - 1, pos[1] - 1] or [l, c] == [pos[0] - 1, pos[1]] or [l, c] == [pos[0] - 1, pos[1] + 1] or [l, c] == [pos[0], pos[1] - 1] or [l, c] == [pos[0], pos[1] + 1] or [l, c] == [pos[0] + 1, pos[1] - 1] or [l, c] == [pos[0] + 1, pos[1]] or [l, c] == [pos[0] + 1, pos[1]+1]:
+                        if mat_game[l][c] == 'X' and mat_cheat[l][c] == '#' and ([l, c] not in confirmed_hits):
+                            confirmed_hits.append([l, c])
+                        elif mat_game[l][c] == '.' and mat_cheat[l][c] == '#' and ([l, c] not in confirmed_hits):
+                            confirmed_hits.append('Alive')
+                            confirmed_hits.append([l, c])
+            if 'Alive' in confirmed_hits:
+                return confirmed_hits
+            else:
+                if len(confirmed_hits) == 1:
+                    return confirmed_hits
+                else:
+                    for i in confirmed_hits:
+                        if i != 'Alive':
+                            if i not in saver:
+                                saver.append(i)
+                                confirmed_hits = ship_wreck_check(i, mat_game, mat_cheat, confirmed_hits, saver)
+                    return confirmed_hits
+        try:
+            l, c = arg.split()
+            l = l.upper()
+            if l in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] and int(c) in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
+                c = int(c) - 1  # Localização da coluna posicional
+                mat_cheat = eng.tab_jogo
+                mat_jogador = eng.tab_estado
+                for i, j in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']):
+                    if l == j:
+                        l = int(i)  # Localização da linha posicional
+                        break
+                for lin in range(len(mat_jogador)):
+                    for col in range(len(mat_jogador[lin])):
+                        # identificação da ação da função do_tiro:
+                        if mat_cheat[l][c] == '.' and [l, c] == [lin, col]:  # o tiro foi dado na água
+                            mat_jogador[l][c] = 'O'
+                            eng.settab_estado(mat_jogador)
+                            eng.add_score()
+                            eng.print_tab_estado()
+                            print('\nAaaarrrrgggghhhh !!! Target missed...\n')
+                            break
+                        if mat_cheat[l][c] == '#' and [l, c] == [lin, col]:  # o tiro foi dado num barco
+                            mat_jogador[l][c] = 'X'
+                            eng.add_score()
+                            eng.settab_estado(mat_jogador)
+                            confirmed_hits = [[l, c]]
+                            # função que permite saber a posição das restantes posições ocupadas pelo barco
+                            lst_conf_hits = ship_wreck_check([l, c], mat_jogador, mat_cheat, confirmed_hits, saver=[])
+                            print(lst_conf_hits)
+                            if 'Alive' in lst_conf_hits:  # Se existirem mais posições ainda não descobertas avisa-se que o tiro acertou num barco sem o afundar
+                                eng.print_tab_estado()
+                                print("\nSHIVER ME TIMBERS !!! On the target but it won't go down...\n")
+                            else:
+                                for posi in lst_conf_hits:  # Caso contrário, se a str('Alive') não existir na lista de hits, todas as posições o barco foi destruido
+                                    mat_jogador[posi[0]][posi[1]] = '*'
+                                eng.settab_estado(mat_jogador)
+                                eng.print_tab_estado()
+                                print('\nSHIVER ME TIMBERS !!! Scuttle!! Target down!!\n')
+                    count = sum([ lin.count('*') for lin in mat_jogador])
+                    if count == 19:
+                        print('\nSHIVER ME TIMBERS !!! Enemy down!! The war is won!!\n')
+                        eng.score_files()
+                        time.sleep(5)
+                        return True
+            else:
+                print('Jogada inválida!')
+        except:
+            print('Jogada inválida!')
 
     def do_agua(self, arg):
         " - comando que leva como parâmetros a linha e a coluna de uma casa, pertencente a uma embarcação já afundada (totalmente descoberta) que se pretende rodear de “água”..: agua <l> <c> \n"
-        pass
+        letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        l, c = arg.split()
+        c = int(c) - 1
+        l = l.upper()
+        for i, j in enumerate(letras):
+            if j == l:
+                l = int(i)
+        loc = [l, c]
+        mat = eng.tab_estado
+        mat_c = eng.tab_jogo
+        counter = []
+        for a in range(len(mat)):
+            for b in range(len(mat[a])):
+                if [a, b] == [loc[0] - 1, loc[1] - 1] or [a, b] == [loc[0] - 1, loc[1]] or [a, b] == [loc[0] - 1, loc[1] + 1] or [a, b] == [loc[0], loc[1] - 1] or [a, b] == [loc[0], loc[1] + 1] or [a, b] == [loc[0] + 1, loc[1] - 1] or [a, b] == [loc[0] + 1, loc[1]] or [a, b] == [loc[0] + 1, loc[1] + 1]:
+                    counter.append([a, b])
+        counter.append(loc)
+
+        for i in counter:
+            if mat_c[i[0]][i[1]] == '#' and mat[i[0]][i[1]] == '.':
+                print('\nAaaarrrrgggghhhh !!! Feed the fish! Fim do jogo!\n')
+                return True
+
+        for i in counter:
+            if mat_c[i[0]][i[1]] == '.' and (mat[i[0]][i[1]] == '*' or mat[i[0]][i[1]] == 'O' or mat[i[0]][i[1]] == '.'):
+                if mat[i[0]][i[1]] != '*':
+                    mat[i[0]][i[1]] = 'O'
+                    eng.settab_estado(mat)
+        eng.print_tab_estado()
+        print('\nAaaarrrrgggghhhh !!! Target missed... Only water!!\n')
 
     def do_linha(self, arg):
         " - comando linha que permite colocar o estado de todas as casas da linha l que ainda não estão determinadas como sendo “água”...: linha <l> \n"
         letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
         import time
-        if arg in letras:
-            eng.score += 1
-            matrix = eng.tab_estado
-            for a in range(len(matrix)):
-                if matrix[letras.index(arg)][a] == 'X' or matrix[letras.index(arg)][a] == '*' or matrix[letras.index(arg)][a] == 'O':
-                    pass
-                elif eng.tab_jogo[letras.index(arg)][a] == '.':
-                    matrix[letras.index(arg)][a] = 'O'
-                else:
-                    print('Perdeu!!! Fim do jogo!')
-                    time.sleep(5)
-                    return True
-            eng.settab_estado(matrix)
-            eng.print_tab_estado()
-        else:
+        try:
+            arg = arg.upper()
+            if arg in letras:
+                eng.add_score()
+                matrix = eng.tab_estado
+                for a in range(len(matrix)):
+                    if matrix[letras.index(arg)][a] == 'X' or matrix[letras.index(arg)][a] == '*' or matrix[letras.index(arg)][a] == 'O':
+                        pass
+                    elif eng.tab_jogo[letras.index(arg)][a] == '.':
+                        matrix[letras.index(arg)][a] = 'O'
+                    else:
+                        print('\nAaaarrrrgggghhhh !!! Feed the fish! Fim do jogo!\n')
+                        eng.score_files()
+                        time.sleep(5)
+                        return True
+                eng.settab_estado(matrix)
+                eng.print_tab_estado()
+                eng.add_move()
+                print('\nAaaarrrrgggghhhh !!! Target missed... Only water!!\n')
+        except:
             print('Jogada inválida!')
 
     def do_coluna(self, arg):
@@ -89,7 +219,7 @@ class BatalhaNavalShell(Cmd):
         numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
         import time
         if arg in numbers:
-            eng.score += 1
+            eng.add_score()
             for a in range(len(eng.tab_estado)):
                 matrix = eng.tab_estado
                 if matrix[a][int(arg)-1] == 'X' or matrix[a][int(arg)-1] == '*' or matrix[a][int(arg)-1] == 'O':
@@ -97,10 +227,14 @@ class BatalhaNavalShell(Cmd):
                 elif eng.tab_jogo[a][int(arg)-1] == '.':
                     matrix[a][int(arg)-1] = 'O'
                 else:
-                    print('Perdeu!!! Fim do jogo!')
+                    print('\nAAaaarrrrgggghhhh !!! Feed the fish! Fim do jogo!\n')
+                    eng.score_files()
                     time.sleep(5)
                     return True
             eng.settab_estado(matrix)
+            eng.print_tab_estado()
+            eng.add_move()
+            print('\nAaaarrrrgggghhhh !!! Target missed... Only water!!\n')
         else:
             print('Jogada inválida!')
 
@@ -122,17 +256,36 @@ class BatalhaNavalShell(Cmd):
             for simbolo in linha:
                 print(simbolo, end=" ")
             print()
-        print("[%s] Jogadas efetuadas:%d" % (eng.jogador, eng.score))
+        print("[%s] Jogadas efetuadas:%d" % (eng.jogador, eng.get_score()))
 
-    
     def do_undo(self, arg):
         " - comando para anular movimentos (retroceder no jogo): undo \n"
-        eng.score += 1
-        pass
+        eng.add_score()
+        eng.undo_move()
+        eng.print_tab_estado()
     
     def do_bot(self, arg):
         " - comando bot para apresentar a sequência de jogadas ótimas para terminar o jogo: bot \n"
-        pass
+        import time
+        mat_c = eng.tab_jogo
+        mat = eng.tab_estado
+        lst_aimbot = []
+        for i in range(len(mat)):
+            for j in range(len(mat[i])):
+                if mat_c[i][j] == '#' and mat[i][j] == '.':
+                    lst_aimbot.append([i, j])
+        target = lst_aimbot[-1]
+        letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+        target[0] = letras[target[0]]
+        target[1] += 1
+        self.do_tiro(target[0] + ' ' + str(target[1]))
+        time.sleep(1)
+        if len(lst_aimbot) != 1:
+            self.do_bot('')
+        else:
+            print('\nSHIVER ME TIMBERS !!! Enemy down!! The war is won!!\n')
+            time.sleep(5)
+            return True
 
     def do_gerar(self, arg):
         " - comando gerar que gera tabuleiros validos..: gerar \n"
@@ -382,10 +535,28 @@ class BatalhaNavalShell(Cmd):
         finally:
             file.close()
 
-
     def do_score(self, arg):
         " - comando score que permite ver o registo ordenado dos scores dos jogadores..: \n"
-        pass
+        import os
+        try:
+            if os.path.exists('Score.txt') is False:
+                print('No score data!!!')
+
+            elif os.path.exists('Score.txt') is True:
+                file = open('Score.txt', 'r')
+                data = file.readlines()[1:]
+                file.close()
+                data1 = [line.replace('\n', '').split() for line in data]
+                dic = {line[0]: int(line[1]) for line in data1}
+                key = list(dic)
+                values = sorted(dic.values(), reverse=True)
+                print('Scores:')
+                for val in values:
+                    for k in key:
+                        if dic[k] == val:
+                            print(f'{values.index(val)+1}º. {k}  {val}')
+        except:
+            print('Erro!!!')
 
     def do_ver(self, arg):
         " - Comando para visualizar o estado atual do tabuleiro em ambiente grafico caso seja válido: VER  \n"
@@ -397,10 +568,11 @@ class BatalhaNavalShell(Cmd):
         
     def do_sair(self, arg):
         "Sair do programa BatalhaNaval: sair"
+        eng.score_files()
         print('Obrigado por ter utilizado o BatalhaNaval, espero que tenha sido divertido!')
         global janela  # pois pretendo atribuir um valor a um identificador global
         if janela is not None:
-                    del janela  # invoca o metodo destruidor de instancia __del__()
+            del janela  # invoca o metodo destruidor de instancia __del__()
         return True
 
 
