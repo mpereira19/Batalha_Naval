@@ -78,16 +78,40 @@ class BatalhaNavalEngine:
         self.tab_estado = t
 
     def create_jogadas_history(self):
+        '''
+        Função que cria um documento onde serão guardados todos os movimentos.
+
+        Returns
+        -------
+        None.
+
+        '''
         file = open(self.plays, 'w')
         file.write(str(self.tab_estado))
         file.close()
 
     def add_move(self):
+        '''
+        Função que ao ser chamada acrescenta esse movimento ao ficheiro dos movimentos.
+
+        Returns
+        -------
+        None.
+
+        '''
         file = open(self.plays, 'a')
         file.writelines('\n' + str(self.tab_estado))
         file.close()
 
     def undo_move(self):
+        '''
+        Função que ao ser chamada retrocede um movimento do jogo.
+
+        Returns
+        -------
+        None.
+
+        '''
         import ast
         file = open(self.plays, 'r')
         lines = file.readlines()
@@ -117,6 +141,14 @@ class BatalhaNavalEngine:
         return self.score
 
     def score_files(self):
+        '''
+        Função que guarda no documento 'Score.txt' todos os scores e jogador que jogaram a batalha naval.
+
+        Returns
+        -------
+        None.
+
+        '''
         import os
         try:
             if os.path.exists('Score.txt') is False:
