@@ -160,7 +160,7 @@ class BatalhaNavalShell(Cmd):
                                 eng.settab_estado(mat_jogador)
                                 eng.print_tab_estado()
                                 print('\nSHIVER ME TIMBERS !!! Scuttle!! Target down!!\n')
-                    count = sum([ lin.count('*') for lin in mat_jogador])
+                    count = sum([lin.count('*') for lin in mat_jogador])
                     if count == 19:
                         print('\nSHIVER ME TIMBERS !!! Enemy down!! The war is won!!\n')
                         eng.score_files()
@@ -667,7 +667,7 @@ class BatalhaNavalShell(Cmd):
                 data1 = [line.replace('\n', '').split() for line in data]
                 dic = {line[0]: int(line[1]) for line in data1}
                 key = list(dic)
-                values = sorted(dic.values(), reverse=True)
+                values = sorted(dic.values())
                 print('Scores:')
                 for val in values:
                     for k in key:
