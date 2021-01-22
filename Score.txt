@@ -1,0 +1,5 @@
+Scores:
+Mariana  39
+Joao  20
+Maria  30
+Juliana 25

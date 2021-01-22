@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
-'''
+"""
 Created on 28/10/2019
 
 @author: valves
-'''
+"""
 
 
 class BatalhaNavalEngine:
@@ -13,15 +13,15 @@ class BatalhaNavalEngine:
         self.tab_estado = []  # matriz que representa o tabuleiro com o estado do jogo
         self.jogador = "top_gun"
         self.score = 0
-        self.filename = ''
         self.plays = 'jogadas.txt'
     
     def ler_tabuleiro_ficheiro(self, filename):
-        '''
-        Cria nova instancia do jogo numa matriz
+        """
+        Cria nova instância do jogo numa matriz
         :param filename: nome do ficheiro a ler
         como o formato é fixo sabe-se o que contem cada linha
-        '''
+        """
+
         try:
             ficheiro = open(filename, "r")
             lines = ficheiro.readlines()  # ler as linhas do ficheiro para a lista lines
@@ -33,7 +33,6 @@ class BatalhaNavalEngine:
                 self.tab_estado.append(lines[i].split())
             estado = True
             self.score = int(lines[23])
-            self.set_filename(filename)
         except:
             print("Erro: na leitura do tabuleiro")
             estado = False
@@ -51,7 +50,7 @@ class BatalhaNavalEngine:
             for simbolo in linha:
                 print(simbolo, end=" ")
             print()
-        print("[%s] Jogadas efetuadas:%d" % (self.jogador, self.score))
+        print("[%s] Jogadas efetuadas: %d" % (self.jogador, self.score))
         
     def print_tab_estado(self):
         print("\n  1 2 3 4 5 6 7 8 9 10")
@@ -63,7 +62,7 @@ class BatalhaNavalEngine:
             for simbolo in linha:
                 print(simbolo, end=" ")
             print()
-        print("[%s] Jogadas efetuadas:%d" % (self.jogador, self.score))
+        print("[%s] Jogadas efetuadas: %d" % (self.jogador, self.score))
 
     def setjogador(self, jog):
         self.jogador = jog
@@ -78,40 +77,43 @@ class BatalhaNavalEngine:
         self.tab_estado = t
 
     def create_jogadas_history(self):
-        '''
+        """
         Função que cria um documento onde serão guardados todos os movimentos.
 
         Returns
         -------
         None.
 
-        '''
+        """
+
         file = open(self.plays, 'w')
         file.write(str(self.tab_estado))
         file.close()
 
     def add_move(self):
-        '''
+        """
         Função que ao ser chamada acrescenta esse movimento ao ficheiro dos movimentos.
 
         Returns
         -------
         None.
 
-        '''
+        """
+
         file = open(self.plays, 'a')
         file.writelines('\n' + str(self.tab_estado))
         file.close()
 
     def undo_move(self):
-        '''
+        """
         Função que ao ser chamada retrocede um movimento do jogo.
 
         Returns
         -------
         None.
 
-        '''
+        """
+
         import ast
         file = open(self.plays, 'r')
         lines = file.readlines()
@@ -128,27 +130,19 @@ class BatalhaNavalEngine:
         last_move = ast.literal_eval(move[len(move)-1])
         self.settab_estado(last_move)
 
-    def set_filename(self, arg):
-        self.filename = arg
-
-    def get_filename(self):
-        return self.filename
-
     def add_score(self):
         self.score += 1
 
-    def get_score(self):
-        return self.score
-
     def score_files(self):
-        '''
+        """
         Função que guarda no documento 'Score.txt' todos os scores e jogador que jogaram a batalha naval.
 
         Returns
         -------
         None.
 
-        '''
+        """
+
         import os
         try:
             if os.path.exists('Score.txt') is False:
@@ -163,25 +157,20 @@ class BatalhaNavalEngine:
                 data1 = [line.replace('\n', '').split() for line in data]
                 dic = {line[0]: int(line[1]) for line in data1}
                 if self.jogador in list(dic):
-                    if self.score > dic[self.jogador]:
+                    if self.score < dic[self.jogador]:
                         dic[self.jogador] = self.score
                 else:
                     dic[self.jogador] = self.score
                 key = list(dic)
-                values = sorted(dic.values(), reverse=True)
                 file = open('Score.txt', 'w')
                 file.write('Scores:\n')
-                for val in values:
-                    for k in key:
-                        if dic[k] == val and val != values[-1]:
-                            file.write(f'{k}  {val}\n')
-                        elif dic[k] == val and val == values[-1]:
-                            file.write(f'{k}  {val}')
+                for k in key:
+                    if k != key[-1]:
+                        file.write(f'{k}  {val}\n')
+                    else:
+                        file.write(f'{k}  {val}')
         except:
             print('Erro em guardar score!!!')
 
         else:
             file.close()
-
-
-
