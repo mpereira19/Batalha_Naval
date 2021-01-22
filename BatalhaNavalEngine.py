@@ -166,9 +166,9 @@ class BatalhaNavalEngine:
                 file.write('Scores:\n')
                 for k in key:
                     if k != key[-1]:
-                        file.write(f'{k}  {val}\n')
+                        file.write(f'{k}  {dic[k]}\n')
                     else:
-                        file.write(f'{k}  {val}')
+                        file.write(f'{k}  {dic[k]}')
         except:
             print('Erro em guardar score!!!')
 
