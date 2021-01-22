@@ -71,22 +71,38 @@ class BatalhaNavalShell(Cmd):
         return estado
     
     def do_tiro(self, arg):
-        '''
-        - comando tiro que leva como parâmetros a linha e a coluna de uma casa onde se pretende jogar..: tiro <l> <c>.
-
-        Parameters
-        ----------
-        arg : Posição: [l, c]
-
-        Returns
-        -------
-        print do estado de jogo atual com o efeito da função do_tiro
-
-        '''
-
+        '- comando tiro que leva como parâmetros a linha e a coluna de uma casa onde se pretende jogar..: tiro <l> <c>.\n'
         import time
 
         def ship_wreck_check(pos, mat_game, mat_cheat, confirmed_hits, saver):
+            '''
+            Esta função permite determinar a integridade de um navio. Isto é, se
+        todas as posições 'barco' que lhe pertencem foram já ou não destruidas pelo jogador.
+            
+            Parameters
+            ----------
+            pos : Lst
+                Posição onde o jogador acertou o tiro no barco.
+            mat_game : Lst
+                Matriz que representa o estado do jogo.
+            mat_cheat : Lst
+                Matriz com todas as posições "barco"
+            confirmed_hits : Lst
+                Lista com todas as posições que já foram ou não destruidas pelo jogador.
+            Onde caso ainda não tenham sido destruidas é inserido uma string 'Alive'.
+            saver : Lst
+                Permite que o loop for final identifique posições ao redor de 
+            todas as posições que constituem o barco
+
+            Returns
+            -------
+            confirmed_hits : Lst
+                Lista com todas as posições que constituem o barco onde o jogador acertou
+            e se continua vivo ou não.
+
+            '''
+            
+            
             for l in range(len(mat_cheat)):
                 for c in range(len(mat_cheat[l])):
                     if [l, c] == [pos[0] - 1, pos[1] - 1] or [l, c] == [pos[0] - 1, pos[1]] or [l, c] == [pos[0] - 1, pos[1] + 1] or [l, c] == [pos[0], pos[1] - 1] or [l, c] == [pos[0], pos[1] + 1] or [l, c] == [pos[0] + 1, pos[1] - 1] or [l, c] == [pos[0] + 1, pos[1]] or [l, c] == [pos[0] + 1, pos[1]+1]:
@@ -203,7 +219,6 @@ class BatalhaNavalShell(Cmd):
                         matrix[letras.index(arg)][a] = 'O'
                     else:
                         print('\nAaaarrrrgggghhhh !!! Feed the fish! Fim do jogo!\n')
-                        eng.score_files()
                         time.sleep(5)
                         return True
                 eng.settab_estado(matrix)
@@ -227,7 +242,6 @@ class BatalhaNavalShell(Cmd):
                     matrix[a][int(arg)-1] = 'O'
                 else:
                     print('\nAAaaarrrrgggghhhh !!! Feed the fish! Fim do jogo!\n')
-                    eng.score_files()
                     time.sleep(5)
                     return True
             eng.settab_estado(matrix)
@@ -288,6 +302,22 @@ class BatalhaNavalShell(Cmd):
         import random
 
         def pos_checker2(checker, pos):
+            '''
+
+            Parameters
+            ----------
+            checker : TYPE
+                A variavel 'checker' server para determinar se a variavel 'pos' é válida no contexto da matriz que representa o tabuleiro
+            pos : TYPE
+                Variavel que determina uma determinada posição válida(ou não) na matriz que representa o tabuleiro
+
+            Returns
+            -------
+            check : TYPE
+                True = Posição válida
+                False = Posição fora dos limites da matriz
+
+            '''
             if (10 not in pos) and (-1 not in pos):
                 if pos not in checker:
                     check = True
@@ -298,6 +328,26 @@ class BatalhaNavalShell(Cmd):
             return check
 
         def id_square(pos, checker, mat, pos_checker2):
+            '''
+            Função que identifica e guarda todas as 8 posições que rodeiam uma determinada posição
+
+            Parameters
+            ----------
+            pos : Lst
+                posição a procurar os identificadores que a rodeiam
+            checker : Lst
+                Checker é a lista que contem todas a posições válidas que rodeiam a "pos"
+            mat : Lst
+                Matriz identificadora do tabuleiro do jogo
+            pos_checker2 : Func
+                Função de determinação de posições válidas
+
+            Returns
+            -------
+            checker : TYPE
+                Lista com posições ( [linha,coluna] ) válidas que rodeiam a posição "pos"
+
+            '''
             for l in range(len(mat)):
                 for c in range(len(mat[l])):
                     if [l, c] == [pos[0] - 1, pos[1] - 1] or [l, c] == [pos[0] - 1, pos[1]] or [l, c] == [pos[0] - 1, pos[1] + 1] or [l, c] == [pos[0], pos[1] - 1] or [l, c] == [pos[0], pos[1] + 1] or [l, c] == [pos[0] + 1, pos[1] - 1] or [l, c] == [pos[0] + 1, pos[1]] or [l, c] == [pos[0] + 1, pos[1] + 1]:
@@ -306,12 +356,38 @@ class BatalhaNavalShell(Cmd):
             return checker
 
         def pos_maker():
+            '''
+            Com recurso ao package Random, é possivel aleatóriamente criar posições, válidas, para serem marcadas como posição de um navio (ou parte do mesmo)
+            
+            Returns
+            -------
+            posicao : Lst
+                posição aleatória onde é representada por um lista: [linha, coluna]
+
+            '''
             posl = random.randint(0, 9)
             posc = random.randint(0, 9)
             posicao = [posl, posc]
             return posicao
 
         def make_turn(turn, pos):
+            '''
+            Como alguns navios têm mais de que 1 posição que lhes é atribuida, é necessário perceber qual é o lado que vão tomar. 
+        
+            Parameters
+            ----------
+            turn : string
+                'R'-> Right | 'L'-> Left | 'U'-> Up | 'D'-> Down
+                
+            pos : Lst
+                Posição inicial.
+
+            Returns
+            -------
+            pos_turn : Lst
+                Posição seguinte e o lado que lhe é atribuida.
+
+            '''
             if turn == 'U':
                 pos_turn = [pos[0] - 1, pos[1]]
             if turn == 'D':
@@ -323,6 +399,29 @@ class BatalhaNavalShell(Cmd):
             return pos_turn
 
         def cruzador(turn, pos, checker):
+            '''
+            O navio Cruzador é constituido por 4 casas seguidas e como não possiu uma
+        posição central, assomiu-se que esta seria a posição 2 que lhe diz respeito.
+        A posição do barco será gerada bem como o lado de viragem
+
+            Parameters
+            ----------
+            turn : string
+                'R'-> Right | 'L'-> Left | 'U'-> Up | 'D'-> Down
+            pos : Lst
+                Posição central do cruzador
+            checker : Lst
+                A lista checker é uma lista com todas as posições ocupadas por navios.
+            Serve de confirmação para posições que ainda não foram acupadas por outros navios.
+
+            Returns
+            -------
+            TYPE
+                False-> Se alguma possivel posição é inválida (fora dos limites da matriz ou já ocupada)
+                
+                Caso todas as posições sejam válidas, dá return a uma lista com as mesmas.
+
+            '''
             if turn == 'R':
                 turn1 = make_turn('R', pos)
                 turn2 = make_turn('R', turn1)
@@ -358,6 +457,29 @@ class BatalhaNavalShell(Cmd):
             return lst_pos_crz
 
         def porta_avioes(turn, pos, checker):
+            '''
+            O porta-aviões é um navio que ocupa 5 casas: 3 por 2 (forma T).
+            É necessário gerar 5 posições em forma de T que sejam válidas.
+            A posição central do porta aviões é a posição que liga a parte vertical
+        à horizontal.
+
+            Parameters
+            ----------
+            turn : string
+                'R'-> Right | 'L'-> Left | 'U'-> Up | 'D'-> Down
+            pos : TYPE
+                Posição central do porta-aviões
+            checker : TYPE
+                Lista com as posições já ocupadas por barcos.
+
+            Returns
+            -------
+            TYPE
+                False -> se alguma das posições é inválida ou já ocupada.
+                
+                Caso todas as posições sejam válidas dá return a uma lista com as mesmas
+
+            '''
             if turn == 'R':
                 turn1 = make_turn('U', pos)
                 turn2 = make_turn('D', pos)
